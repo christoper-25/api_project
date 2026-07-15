@@ -355,6 +355,74 @@ body{
     font-size: 22px;
 }
 
+.card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    gap:20px;
+}
+
+.music-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    transition:transform .25s ease, background .25s ease;
+    position:relative;
+}
+
+.music-card:hover{
+    transform:translateY(-4px);
+    background:var(--card-hover);
+}
+
+.music-card img{
+    width:100%;
+    aspect-ratio:1;
+    object-fit:cover;
+    border-radius:12px;
+    margin-bottom:12px;
+}
+
+.music-card-info h3{
+    font-size:16px;
+    margin-bottom:6px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.music-card-info p{
+    color:var(--text-light);
+    font-size:14px;
+}
+
+.music-card .play-button{
+    position:absolute;
+    right:16px;
+    bottom:16px;
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    background:var(--green);
+    color:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 8px 16px rgba(0,0,0,0.25);
+}
+
+.music-card .play-button:hover{
+    transform:scale(1.05);
+}
+
+.loading{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--text-light);
+}
 
 .hidden{
 
