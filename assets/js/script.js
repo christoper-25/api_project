@@ -27,88 +27,8 @@ const duration = document.getElementById("duration");
 let timer;
 
 
-function createSongCard(song){
 
-    const card = document.createElement("div");
-    card.className = "music-card";
-
-    const cover = song.album && song.album.cover_medium
-        ? song.album.cover_medium
-        : "assets/images/default-cover.png";
-
-    const title = song.title_short || song.title || "Untitled song";
-    const artist = song.artist && song.artist.name
-        ? song.artist.name
-        : "Unknown artist";
-
-    card.innerHTML = `
-        <img src="${cover}" alt="${title}">
-        <div class="music-card-info">
-            <h3>${title}</h3>
-            <p>${artist}</p>
-        </div>
-        <button class="play-button">
-            <i class="fas fa-play"></i>
-        </button>
-    `;
-
-    card.querySelector(".play-button").addEventListener("click", () => {
-        playPreview(song.preview, title, artist, cover);
-    });
-
-    return card;
-}
-
-
-function renderSongCards(container, songs){
-
-    if(!container)
-        return;
-
-    container.innerHTML = "";
-
-    if(!songs || songs.length === 0){
-        container.innerHTML = '<p class="text-muted">No songs available right now.</p>';
-        return;
-    }
-
-    songs.slice(0, 6).forEach(song => {
-        container.appendChild(createSongCard(song));
-    });
-}
-
-
-async function loadFeaturedSongs(container, query){
-
-    if(!container)
-        return;
-
-    container.innerHTML = `
-        <div class="loading">
-            <i class="fas fa-spinner fa-spin"></i>
-            Loading songs...
-        </div>
-    `;
-
-    try{
-        const response = await fetch("search.php?q=" + encodeURIComponent(query));
-        const data = await response.json();
-
-        renderSongCards(container, data.songs || []);
-    }
-    catch(error){
-        console.error(error);
-        container.innerHTML = '<p class="text-muted">Unable to load songs right now.</p>';
-    }
-}
-
-
-// ===============================
-// SEARCH
-// ===============================
-
-
-if(searchInput){
+// Search when typing
 
     searchInput.addEventListener("keyup", function(){
 
