@@ -37,7 +37,7 @@ $tracks = $deezerData["data"] ?? [];
 // GENIUS SEARCH
 // =====================
 
-$token = "YOUR_GENIUS_TOKEN";
+$token = "yvBQ9bM2rk8SlTizh86zHMDMJdQzj-m0Rbiu7hdStMFN88_RCLlbOnochfQPFmbs";
 
 $geniusUrl = "https://api.genius.com/search?q=" . urlencode($q);
 
