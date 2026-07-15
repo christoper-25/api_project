@@ -1,107 +1,169 @@
+<?php
+session_start();
+
+// Sample Data (Will be replaced with MySQL later)
+
+$quickPicks = [
+    ["title" => "Liked Songs", "image" => "https://picsum.photos/300?random=1"],
+    ["title" => "Daily Mix 1", "image" => "https://picsum.photos/300?random=2"],
+    ["title" => "Daily Mix 2", "image" => "https://picsum.photos/300?random=3"],
+    ["title" => "Top Hits", "image" => "https://picsum.photos/300?random=4"],
+    ["title" => "Chill Vibes", "image" => "https://picsum.photos/300?random=5"],
+    ["title" => "Coding Music", "image" => "https://picsum.photos/300?random=6"]
+];
+
+$playlists = [
+    [
+        "title" => "Made For You",
+        "desc" => "Hand-picked songs you'll love.",
+        "image" => "https://picsum.photos/300?random=11"
+    ],
+    [
+        "title" => "Today's Top Hits",
+        "desc" => "The biggest songs today.",
+        "image" => "https://picsum.photos/300?random=12"
+    ],
+    [
+        "title" => "Lo-Fi Beats",
+        "desc" => "Relax while studying.",
+        "image" => "https://picsum.photos/300?random=13"
+    ],
+    [
+        "title" => "Workout Mix",
+        "desc" => "Boost your energy.",
+        "image" => "https://picsum.photos/300?random=14"
+    ],
+    [
+        "title" => "Acoustic",
+        "desc" => "Soft acoustic favorites.",
+        "image" => "https://picsum.photos/300?random=15"
+    ],
+    [
+        "title" => "Party Mix",
+        "desc" => "Weekend vibes.",
+        "image" => "https://picsum.photos/300?random=16"
+    ]
+];
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Deezer Search Demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musicify</title>
 
-    <style>
-        body{
-            font-family: Arial;
-            margin:40px;
-        }
+    <link rel="stylesheet" href="assets/css/style.css">
 
-        input{
-            width:300px;
-            padding:10px;
-        }
-
-        button{
-            padding:10px 20px;
-        }
-
-        .song{
-            border:1px solid #ddd;
-            padding:15px;
-            margin-top:15px;
-            display:flex;
-            gap:15px;
-            align-items:center;
-        }
-
-        img{
-            width:120px;
-            border-radius:8px;
-        }
-    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
 
-<h2>Search Songs</h2>
+    <div class="app">
 
-<input
-    type="text"
-    id="keyword"
-    placeholder="Enter song or artist">
+        <?php include 'includes/sidebar.php'; ?>
 
-<button onclick="searchSong()">
-    Search
-</button>
+        <main class="main">
 
-<hr>
+            <?php include 'includes/topbar.php'; ?>
 
-<div id="result"></div>
+            <!-- Greeting -->
+            <section class="greeting">
+                <h1>Discover Music</h1>
+                <p>Listen to trending songs from around the world.</p>
+            </section>
+            <section class="section" id="searchSection" style="display:none;">
 
-<script>
-
-function searchSong(){
-
-    let keyword = document.getElementById("keyword").value;
-
-    fetch("search.php?q=" + encodeURIComponent(keyword))
-    .then(response => response.json())
-    .then(data => {
-
-        let html = "";
-
-        if(data.data.length==0){
-            html="No songs found.";
-        }
-
-        data.data.forEach(song=>{
-
-            html += `
-                <div class="song">
-
-                    <img src="${song.album.cover_medium}">
-
-                    <div>
-
-                        <h3>${song.title}</h3>
-
-                        <b>${song.artist.name}</b><br>
-
-                        Album : ${song.album.title}
-
-                        <br><br>
-
-                        <audio controls>
-                            <source src="${song.preview}" type="audio/mpeg">
-                        </audio>
-
-                    </div>
-
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-search"></i>
+                        Search Results
+                    </h2>
                 </div>
-            `;
 
-        });
+                <div class="card-grid" style=" display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 20px;" id="searchResults"></div>
 
-        document.getElementById("result").innerHTML = html;
+            </section>
 
-    });
+            <!-- Trending Songs -->
+            <section class="section">
 
-}
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-fire"></i>
+                        Trending Songs
+                    </h2>
+                    <a href="#">View All</a>
+                </div>
 
-</script>
+                <div class="card-grid" id="trendingSongs">
+                    <!-- Filled by JavaScript -->
+                </div>
+
+            </section>
+
+            <!-- New Releases -->
+            <section class="section">
+
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-compact-disc"></i>
+                        New Releases
+                    </h2>
+                    <a href="#">View All</a>
+                </div>
+
+                <div class="card-grid" id="newReleases">
+                </div>
+
+            </section>
+
+            <!-- Top Artists -->
+            <section class="section">
+
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-microphone"></i>
+                        Top Artists
+                    </h2>
+                    <a href="#">View All</a>
+                </div>
+
+                <div class="card-grid" id="topArtists">
+                </div>
+
+            </section>
+
+            <!-- Popular Albums -->
+            <section class="section">
+
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-record-vinyl"></i>
+                        Popular Albums
+                    </h2>
+                    <a href="#">View All</a>
+                </div>
+
+                <div class="card-grid" id="albums">
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <?php include 'includes/footer.php'; ?>
+
+    <script src="assets/js/script.js"></script>
+    <audio id="player" controls></audio>
+
 
 </body>
+
 </html>
