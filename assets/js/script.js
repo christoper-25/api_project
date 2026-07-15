@@ -13,8 +13,6 @@ const searchResults = document.getElementById("searchResults");
 
 let timer;
 
-
-
 // Search when typing
 
 searchInput.addEventListener("keyup", function(){
