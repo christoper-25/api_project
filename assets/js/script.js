@@ -89,6 +89,15 @@ searchInput.addEventListener("keyup", function() {
 async function searchSong(query) {
     searchSection.style.display = "block";
 
+    // ===== ADDED BY KWATRO =====
+    // Bug fix: when the user had scrolled down the page and then typed a search,
+    // the results would render inside #searchSection but stay out of view,
+    // so the user had to manually scroll back up to see them.
+    // This line scrolls the page so #searchSection comes into view automatically
+    // as soon as a search starts, using smooth scrolling instead of an instant jump.
+    searchSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    // ===== END KWATRO EDIT =====
+
     searchResults.innerHTML = `
         <div class="loading">
             <i class="fas fa-spinner fa-spin"></i>
