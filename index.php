@@ -73,6 +73,22 @@ $playlists = [
                 <h1>Discover Music</h1>
                 <p>Listen to trending songs from around the world.</p>
             </section>
+
+            <!-- NOW PLAYING (new: centered player + lyrics) -->
+            <section class="section now-playing" id="nowPlayingSection" style="display:none;">
+                <button id="backBtn" style="margin-bottom:15px;background:none;border:none;color:inherit;cursor:pointer;font-size:1rem;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <div class="now-playing-content" style="max-width:520px;margin:0 auto;text-align:center;">
+                    <img id="npCover" src="" width="260" style="border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);">
+                    <h2 id="npTitle" style="margin-top:16px;">-</h2>
+                    <p id="npArtist" style="opacity:.7;">-</p>
+                    <div class="lyrics-box" id="lyricsBox" style="margin-top:24px;text-align:left;max-height:360px;overflow-y:auto;line-height:1.7;">
+                        <p style="opacity:.6;">Select a song to see lyrics.</p>
+                    </div>
+                </div>
+            </section>
+
             <section class="section" id="searchSection" style="display:none;">
 
                 <div class="section-header">
@@ -90,7 +106,7 @@ $playlists = [
             </section>
 
             <!-- Trending Songs -->
-            <section class="section">
+            <section class="section" id="trendingSection">
 
                 <div class="section-header">
                     <h2>
@@ -107,7 +123,7 @@ $playlists = [
             </section>
 
             <!-- New Releases -->
-            <section class="section">
+            <section class="section" id="newReleasesSection">
 
                 <div class="section-header">
                     <h2>
@@ -123,7 +139,7 @@ $playlists = [
             </section>
 
             <!-- Top Artists -->
-            <section class="section">
+            <section class="section" id="topArtistsSection">
 
                 <div class="section-header">
                     <h2>
@@ -139,7 +155,7 @@ $playlists = [
             </section>
 
             <!-- Popular Albums -->
-            <section class="section">
+            <section class="section" id="albumsSection">
 
                 <div class="section-header">
                     <h2>
