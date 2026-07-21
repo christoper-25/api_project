@@ -1,27 +1,72 @@
-const trendingSongs = document.getElementById("trendingSongs");
-const newReleases = document.getElementById("newReleases");
-const topArtists = document.getElementById("topArtists");
-const albums = document.getElementById("albums");
+const trendingSongsContainer = document.getElementById("trendingSongs");
+const newReleasesContainer = document.getElementById("newReleases");
+const topArtistsContainer = document.getElementById("topArtists");
+const albumsContainer = document.getElementById("albums");
 
 const searchInput = document.getElementById("searchInput");
+
+function createSongCard(song) {
+    const image = song.album?.cover_medium || song.artist?.picture_medium || "assets/images/default-cover.png";
+    const title = song.title || song.name || "Untitled";
+    const artist = song.artist?.name || "Unknown Artist";
+
+    const card = document.createElement("div");
+    card.className = "music-card";
+    card.innerHTML = `
+        <img src="${image}" width="200">
+        <h3>${title}</h3>
+        <p>${artist}</p>
+        <button class="play-button">
+            <i class="fas fa-play"></i>
+        </button>
+    `;
+
+    card.querySelector(".play-button").addEventListener("click", function() {
+        playPreview(song.preview, title, artist, image);
+    });
+
+    return card;
+}
+
+async function loadSection(type, container) {
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            Loading songs...
+        </div>
+    `;
+
+    try {
+        const response = await fetch("search.php?type=" + encodeURIComponent(type));
+        const data = await response.json();
+
+        if (!data.songs || data.songs.length === 0) {
+            container.innerHTML = `<p>No songs found.</p>`;
+            return;
+        }
+
+        container.innerHTML = "";
+        data.songs.slice(0, 6).forEach(song => {
+            container.appendChild(createSongCard(song));
+        });
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = `<p>Failed to load songs.</p>`;
+    }
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+    loadSection("trending", trendingSongsContainer);
+    loadSection("new", newReleasesContainer);
+    loadSection("artists", topArtistsContainer);
+    loadSection("popular", albumsContainer);
+});
 
 const searchSection = document.getElementById("searchSection");
 
 const searchResults = document.getElementById("searchResults");
-
-
-const audioPlayer = document.getElementById("audioPlayer");
-
-const playBtn = document.getElementById("playBtn");
-
-const progressBar = document.getElementById("progressBar");
-
-const volume = document.getElementById("volume");
-
-const currentTime = document.getElementById("currentTime");
-
-const duration = document.getElementById("duration");
-
 
 
 let timer;
@@ -30,59 +75,46 @@ let timer;
 
 // Search when typing
 
-    searchInput.addEventListener("keyup", function(){
+searchInput.addEventListener("keyup", function(){
 
 
-        clearTimeout(timer);
+    clearTimeout(timer);
 
 
-        let query = this.value.trim();
-
-
-
-        if(query.length < 2){
-
-
-            searchSection.style.display = "none";
-
-            searchResults.innerHTML = "";
-
-            loadFeaturedSongs(trendingSongs, "trending");
-
-            return;
-
-
-        }
+    let query = this.value.trim();
 
 
 
-        timer = setTimeout(()=>{
+    if(query.length < 2){
 
+        searchSection.style.display = "none";
 
-            searchSong(query);
+        searchResults.innerHTML = "";
 
+        return;
 
-        },500);
-
-
-
-    });
-
-}
+    }
 
 
 
+    timer = setTimeout(function(){
 
-// ===============================
-// DEEZER + GENIUS SEARCH
-// ===============================
+        searchSong(query);
+
+    },500);
+
+
+
+});
+
+
+
 
 
 async function searchSong(query){
 
 
     searchSection.style.display = "block";
-
 
 
     searchResults.innerHTML = `
@@ -135,93 +167,38 @@ async function searchSong(query){
 
 
 
-        data.songs.forEach(song=>{
 
-
+        data.songs.forEach(song => {
             let card = document.createElement("div");
-
-
             card.className = "music-card";
-
-
-
             card.innerHTML = `
-
-
                 <img 
                 src="${song.album.cover_medium}"
                 width="200"
                 >
-
-
-
                 <h3>
-                    ${song.title}
+                ${song.title}
                 </h3>
-
-
-
                 <p>
-                    ${song.artist.name}
+                ${song.artist.name}
                 </p>
-
-
-
                 <button class="play-button">
 
-                    <i class="fas fa-play"></i>
-
+                    <i class="fas fa-play" class=""></i>
                 </button>
-
-
-
-                ${
-                    song.genius_url
-                    ?
-                    `
-                    <a 
-                    href="${song.genius_url}"
-                    target="_blank"
-                    class="lyrics-button">
-
-                        <i class="fas fa-music"></i>
-                        Lyrics
-
-                    </a>
-                    `
-                    :
-                    ""
-                }
-
-
-
             `;
 
+            card.querySelector(".play-button")
+.addEventListener("click", function(){
+console.log(song.preview);
+    playPreview(
+        song.preview,
+        song.title,
+        song.artist.name,
+        song.album.cover_medium
+    );
 
-
-            let playButton =
-            card.querySelector(".play-button");
-
-
-
-            playButton.addEventListener("click",()=>{
-
-
-                playPreview(
-
-                    song.preview,
-
-                    song.title,
-
-                    song.artist.name,
-
-                    song.album.cover_medium
-
-                );
-
-
-            });
-
+});
 
 
 
@@ -233,13 +210,12 @@ async function searchSong(query){
 
 
 
-
     }
+
     catch(error){
 
 
         console.log(error);
-
 
 
         searchResults.innerHTML = `
@@ -261,345 +237,64 @@ async function searchSong(query){
 
 
 
+function playPreview(url, title, artist, cover){
 
-if(trendingSongs){
-    loadFeaturedSongs(trendingSongs, "trending");
-}
-
-if(newReleases){
-    loadFeaturedSongs(newReleases, "new release");
-}
-
-if(topArtists){
-    loadFeaturedSongs(topArtists, "artist");
-}
-
-if(albums){
-    loadFeaturedSongs(albums, "album");
-}
-
-// ===============================
-// AUDIO PLAYER
-// ===============================
-
-
-function playPreview(url,title,artist,cover){
-
+    let audio = document.getElementById("audioPlayer");
 
 
     if(!url){
 
-
-        alert("No preview available.");
+        alert("No preview available for this song.");
 
         return;
-
 
     }
 
 
+    audio.src = url;
 
-    audioPlayer.src = url;
-
-
-    audioPlayer.load();
+    audio.load();
 
 
-
-    audioPlayer.play()
-
+    audio.play()
     .then(()=>{
 
-
-        updatePlayer(
-
-            title,
-
-            artist,
-
-            cover
-
-        );
-
-
-        setPauseIcon();
-
+        console.log("Playing:", title);
 
     })
-
     .catch(error=>{
 
-
-        console.log(error);
-
+        console.log("Playback error:", error);
 
     });
 
 
 
-}
-
-
-
-
-// ===============================
-// UPDATE FOOTER
-// ===============================
-
-
-function updatePlayer(title,artist,cover){
-
-
-
-    let playerTitle =
-    document.getElementById("playerTitle");
-
-
-
-    let playerArtist =
-    document.getElementById("playerArtist");
-
-
-
-    let playerCover =
-    document.getElementById("playerCover");
+    let playerTitle = document.getElementById("playerTitle");
+    let playerArtist = document.getElementById("playerArtist");
+    let playerCover = document.getElementById("playerCover");
 
 
 
     if(playerTitle)
-
         playerTitle.textContent = title;
 
 
-
     if(playerArtist)
-
         playerArtist.textContent = artist;
 
 
-
     if(playerCover)
-
         playerCover.src = cover;
 
 
 
-}
+    let icon = document.querySelector("#playBtn i");
 
+    if(icon){
 
+        icon.className = "fas fa-pause";
 
-
-
-// ===============================
-// PLAY / PAUSE BUTTON
-// ===============================
-
-
-if(playBtn){
-
-
-    playBtn.addEventListener("click",()=>{
-
-
-        if(audioPlayer.paused){
-
-
-            audioPlayer.play();
-
-            setPauseIcon();
-
-
-        }
-
-        else{
-
-
-            audioPlayer.pause();
-
-            setPlayIcon();
-
-
-        }
-
-
-
-    });
-
-
-}
-
-
-
-
-
-function setPauseIcon(){
-
-
-    let icon =
-    document.querySelector("#playBtn i");
-
-
-
-    if(icon)
-
-        icon.className =
-        "fas fa-pause";
-
-
-}
-
-
-
-function setPlayIcon(){
-
-
-    let icon =
-    document.querySelector("#playBtn i");
-
-
-
-    if(icon)
-
-        icon.className =
-        "fas fa-play";
-
-
-}
-
-
-
-
-
-// ===============================
-// PROGRESS BAR
-// ===============================
-
-
-if(audioPlayer){
-
-
-    audioPlayer.addEventListener("timeupdate",()=>{
-
-
-        if(!audioPlayer.duration)
-
-            return;
-
-
-
-        let percent =
-
-        (audioPlayer.currentTime /
-        audioPlayer.duration) * 100;
-
-
-
-        if(progressBar)
-
-            progressBar.value = percent;
-
-
-
-        if(currentTime)
-
-            currentTime.textContent =
-            formatTime(audioPlayer.currentTime);
-
-
-
-        if(duration)
-
-            duration.textContent =
-            formatTime(audioPlayer.duration);
-
-
-
-    });
-
-
-
-}
-
-
-
-
-
-if(progressBar){
-
-
-    progressBar.addEventListener("input",()=>{
-
-
-        audioPlayer.currentTime =
-
-        (progressBar.value / 100)
-
-        * audioPlayer.duration;
-
-
-
-    });
-
-
-}
-
-
-
-
-// ===============================
-// VOLUME
-// ===============================
-
-
-if(volume){
-
-
-    volume.addEventListener("input",()=>{
-
-
-        audioPlayer.volume =
-        volume.value / 100;
-
-
-    });
-
-
-}
-
-
-
-
-// ===============================
-// TIME FORMAT
-// ===============================
-
-
-function formatTime(seconds){
-
-
-    if(isNaN(seconds))
-
-        return "0:00";
-
-
-
-    let min =
-    Math.floor(seconds / 60);
-
-
-
-    let sec =
-    Math.floor(seconds % 60);
-
-
-
-    if(sec < 10)
-
-        sec = "0" + sec;
-
-
-
-    return min + ":" + sec;
-
+    }
 
 }
