@@ -37,6 +37,7 @@
 
             <button id="playBtn" class="play-button">
                 <i class="fas fa-play"></i>
+                
             </button>
 
             <button id="nextBtn">
