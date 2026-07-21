@@ -372,11 +372,18 @@ if (backBtn) {
     backBtn.addEventListener("click", closeNowPlaying);
 }
 
-// Kumukuha ng lyrics gamit yung libreng lyrics.ovh API, base sa artist +
-// title ng kasalukuyang tumutugtog. Habang naglo-load, may spinner muna;
-// pag walang nahanap na lyrics o nag-error, may fallback message.
+// Kumukuha ng lyrics gamit ang lrclib.net API, base sa artist + title ng
+// kasalukuyang tumutugtog. Kaibahan sa dating lyrics.ovh: nagbibigay ito
+// ng "synced lyrics" — may timestamp bawat linya (hal. [00:12.50]) — kaya
+// kaya na nating malaman kung aling linya ang dapat lumabas sa oras na yun.
+let currentLyrics = []; // array ng { time (seconds), text } bawat linya
+let activeLyricIndex = -1; // index ng linyang kasalukuyang naka-highlight
+
 async function fetchLyrics(title, artist) {
     if (!lyricsBox) return;
+
+    currentLyrics = [];
+    activeLyricIndex = -1;
 
     lyricsBox.innerHTML = `
         <div class="loading">
@@ -387,19 +394,100 @@ async function fetchLyrics(title, artist) {
 
     try {
         const response = await fetch(
-            `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
+            `https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(title)}`
         );
+
+        if (!response.ok) throw new Error("Lyrics not found");
+
         const data = await response.json();
 
-        if (!data.lyrics) {
-            lyricsBox.innerHTML = `<p style="opacity:.6;">Lyrics not found for this song.</p>`;
-            return;
+        if (data.syncedLyrics) {
+            // May timestamp bawat linya — dito tayo mag-hihighlight/mag-cecenter
+            // habang tumutugtog yung kanta.
+            currentLyrics = parseLRC(data.syncedLyrics);
+            renderLyrics();
+        } else if (data.plainLyrics) {
+            // Walang timestamp na available — ipapakita na lang bilang plain
+            // centered lines, wala lang mag-hihighlight.
+            lyricsBox.innerHTML = data.plainLyrics
+                .split("\n")
+                .filter(line => line.trim() !== "")
+                .map(line => `<p class="lyric-line">${line}</p>`)
+                .join("");
+        } else {
+            lyricsBox.innerHTML = `<p class="lyric-line">Lyrics not found for this song.</p>`;
         }
-
-        lyricsBox.innerHTML = `<p style="white-space:pre-line;">${data.lyrics}</p>`;
 
     } catch (error) {
         console.log("Lyrics error:", error);
-        lyricsBox.innerHTML = `<p style="opacity:.6;">Failed to load lyrics.</p>`;
+        lyricsBox.innerHTML = `<p class="lyric-line">Failed to load lyrics.</p>`;
+    }
+}
+
+// Kino-convert yung "LRC" text (format ng synced lyrics: [mm:ss.xx]Text)
+// papuntang array ng { time, text }, pinagsort base sa oras.
+function parseLRC(lrcText) {
+    const timeExp = /\[(\d{2}):(\d{2}(?:\.\d{1,3})?)\]/g;
+    const lines = [];
+
+    lrcText.split("\n").forEach(line => {
+        const matches = [...line.matchAll(timeExp)];
+        if (matches.length === 0) return;
+
+        const text = line.replace(timeExp, "").trim();
+
+        matches.forEach(match => {
+            const minutes = parseInt(match[1], 10);
+            const seconds = parseFloat(match[2]);
+            lines.push({ time: minutes * 60 + seconds, text });
+        });
+    });
+
+    return lines.sort((a, b) => a.time - b.time);
+}
+
+// Ipinapakita yung lahat ng linya sa lyrics box, isa-isang <p class="lyric-line">
+// na may data-index para madali itong mahanap pag hi-nahighlight.
+function renderLyrics() {
+    lyricsBox.innerHTML = currentLyrics
+        .map((line, index) => `<p class="lyric-line" data-index="${index}">${line.text || "♪"}</p>`)
+        .join("");
+}
+
+// Sinusubaybayan yung audio.currentTime para malaman kung anong linya ng
+// lyrics ang "kasabay" ng tugtog ngayon, tapos ino-update yung highlight.
+// (Idinagdag na listener ito sa "timeupdate" — hindi pinalitan yung
+// existing na listener sa taas na para sa progress bar.)
+audio.addEventListener("timeupdate", function() {
+    if (!currentLyrics.length) return;
+
+    let newIndex = -1;
+    for (let i = 0; i < currentLyrics.length; i++) {
+        if (audio.currentTime >= currentLyrics[i].time) {
+            newIndex = i;
+        } else {
+            break;
+        }
+    }
+
+    if (newIndex !== activeLyricIndex) {
+        activeLyricIndex = newIndex;
+        highlightActiveLyricLine();
+    }
+});
+
+// Nag-a-add ng "active" class sa linyang kasalukuyang tumutugma sa oras
+// ng kanta (ito yung nagbibigay ng highlight + mas malaking font), at
+// ino-scroll papunta sa gitna ng lyrics box yung linyang iyon.
+function highlightActiveLyricLine() {
+    const allLines = lyricsBox.querySelectorAll(".lyric-line");
+    allLines.forEach(el => el.classList.remove("active"));
+
+    if (activeLyricIndex < 0) return;
+
+    const activeLine = lyricsBox.querySelector(`.lyric-line[data-index="${activeLyricIndex}"]`);
+    if (activeLine) {
+        activeLine.classList.add("active");
+        activeLine.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 }

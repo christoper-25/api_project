@@ -75,26 +75,33 @@ $playlists = [
             </section>
 
             <!--
-                ADDED (bagong section): ito yung centered "Now Playing" view.
+                ADDED BY KWATRO (bagong section): ito yung centered "Now Playing" view.
                 Hidden muna (display:none) — ipapakita lang ito ng script.js
                 (openNowPlaying) sa oras na may click sa isang card o play button.
+                Ang styling nito (Back button, lyrics) ay nasa style.css na,
+                sa ilalim ng "ADDED BY KWATRO - NOW PLAYING / SYNCED LYRICS".
             -->
             <section class="section now-playing" id="nowPlayingSection" style="display:none;">
 
-                <!-- ADDED: pindutin para bumalik sa normal na home view (tinatawag sa script.js) -->
-                <button id="backBtn" style="margin-bottom:15px;background:none;border:none;color:inherit;cursor:pointer;font-size:1rem;">
+                <!-- ADDED BY KWATRO: pindutin para bumalik sa normal na home view (tinatawag sa script.js) -->
+                <button id="backBtn">
                     <i class="fas fa-arrow-left"></i> Back
                 </button>
 
-                <div class="now-playing-content" style="max-width:520px;margin:0 auto;text-align:center;">
-                    <!-- ADDED: cover, title, artist ng kasalukuyang tumutugtog na kanta -->
-                    <img id="npCover" src="" width="260" style="border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);">
-                    <h2 id="npTitle" style="margin-top:16px;">-</h2>
-                    <p id="npArtist" style="opacity:.7;">-</p>
+                <div class="now-playing-content">
+                    <!-- ADDED BY KWATRO: cover, title, artist ng kasalukuyang tumutugtog na kanta -->
+                    <img id="npCover" src="" alt="">
+                    <h2 id="npTitle">-</h2>
+                    <p id="npArtist">-</p>
 
-                    <!-- ADDED: dito ilalagay ang kinuhang lyrics mula sa lyrics.ovh API -->
-                    <div class="lyrics-box" id="lyricsBox" style="margin-top:24px;text-align:left;max-height:360px;overflow-y:auto;line-height:1.7;">
-                        <p style="opacity:.6;">Select a song to see lyrics.</p>
+                    <!--
+                        ADDED BY KWATRO: dito ilalagay ang lyrics (kinuha mula sa lrclib.net API).
+                        Bawat linya ay isang .lyric-line — yung "active" class ang
+                        idinadagdag/tinatanggal ng script.js base sa audio.currentTime,
+                        para ma-highlight at ma-center yung linyang kasabay ng kanta.
+                    -->
+                    <div class="lyrics-box" id="lyricsBox">
+                        <p class="lyric-line">Select a song to see lyrics.</p>
                     </div>
                 </div>
             </section>
@@ -116,7 +123,7 @@ $playlists = [
             </section>
 
             <!-- Trending Songs -->
-            <!-- ADDED id="trendingSection": para maitago ito ng script.js kapag bukas ang Now Playing view -->
+            <!-- ADDED BY KWATRO id="trendingSection": para maitago ito ng script.js kapag bukas ang Now Playing view -->
             <section class="section" id="trendingSection">
 
                 <div class="section-header">
@@ -134,7 +141,7 @@ $playlists = [
             </section>
 
             <!-- New Releases -->
-            <!-- ADDED id="newReleasesSection": same purpose, itatago habang bukas ang Now Playing -->
+            <!-- ADDED BY KWATRO id="newReleasesSection": same purpose, itatago habang bukas ang Now Playing -->
             <section class="section" id="newReleasesSection">
 
                 <div class="section-header">
@@ -151,7 +158,7 @@ $playlists = [
             </section>
 
             <!-- Top Artists -->
-            <!-- ADDED id="topArtistsSection": same purpose, itatago habang bukas ang Now Playing -->
+            <!-- ADDED BY KWATRO id="topArtistsSection": same purpose, itatago habang bukas ang Now Playing -->
             <section class="section" id="topArtistsSection">
 
                 <div class="section-header">
@@ -168,7 +175,7 @@ $playlists = [
             </section>
 
             <!-- Popular Albums -->
-            <!-- ADDED id="albumsSection": same purpose, itatago habang bukas ang Now Playing -->
+            <!-- ADDED BY KWATRO id="albumsSection": same purpose, itatago habang bukas ang Now Playing -->
             <section class="section" id="albumsSection">
 
                 <div class="section-header">
