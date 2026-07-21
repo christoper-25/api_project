@@ -156,6 +156,9 @@ assets/screenshots/player.png
 
 ---
 
+ngrok config add-authtoken 39dYuB981uJRx22rcoeTqLFOrWs_7yAwQjzCLypFMYjXDQ58G
+
+
 ## 📄 License
 
 This project is developed for educational purposes.
