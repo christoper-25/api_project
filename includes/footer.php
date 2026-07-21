@@ -1,7 +1,6 @@
 <footer class="music-player">
 
     <!-- Left: Current Song -->
-    <?php if(isset($_SESSION['currentSong'])): ?>
     <div class="player-left">
 
         <img
@@ -22,7 +21,6 @@
         </button>
 
     </div>
-    <?php endif; ?>
 
     <!-- Center: Playback Controls -->
     <div class="player-center">
@@ -70,7 +68,6 @@
     </div>
 
     <!-- Right: Volume -->
-    <?php if(isset($_SESSION['currentSong'])): ?>
     <div class="player-right">
 
         <i class="fas fa-volume-low"></i>
@@ -83,7 +80,6 @@
             value="100">
 
     </div>
-    <?php endif; ?>
 
     <!-- Audio Element -->
     <audio id="audioPlayer"></audio>
