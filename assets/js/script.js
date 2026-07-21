@@ -25,6 +25,15 @@ function createSongCard(song) {
         playPreview(song.preview, title, artist, image);
     });
 
+    // ===== ADDED BY KWATRO =====
+    // Dati play button lang ang naka-click. Ngayon kahit saan sa card
+    // (image o title) i-click, tatawagin din yung playPreview() —
+    // kaya same behavior din yung click sa card at click sa play button.
+    card.addEventListener("click", function() {
+        playPreview(song.preview, title, artist, image);
+    });
+    // ===== END KWATRO EDIT =====
+
     return card;
 }
 
@@ -137,6 +146,19 @@ async function searchSong(query) {
                 );
             });
 
+            // ===== ADDED BY KWATRO =====
+            // Pareho ng sa createSongCard() — para pati sa search results,
+            // click sa card mismo (hindi lang sa play button) ay magpe-preview na rin.
+            card.addEventListener("click", function() {
+                playPreview(
+                    song.preview,
+                    song.title,
+                    song.artist.name,
+                    song.album.cover_medium
+                );
+            });
+            // ===== END KWATRO EDIT =====
+
             searchResults.appendChild(card);
         });
 
@@ -197,17 +219,31 @@ function playPreview(url, title, artist, cover) {
     if (playerTitle) playerTitle.textContent = title;
     if (playerArtist) playerArtist.textContent = artist;
     if (playerCover) playerCover.src = cover;
+
+    // ===== ADDED BY KWATRO =====
+    // Pagkatapos i-update yung footer player (logic sa itaas), ipapakita rin
+    // natin yung centered "Now Playing" view at ku-kunin/idi-display yung
+    // lyrics ng kasalukuyang tumutugtog na kanta.
+    openNowPlaying(title, artist, cover);
+    fetchLyrics(title, artist);
+    // ===== END KWATRO EDIT =====
 }
 
-// Play / Pause button in the footer
+// Play / Pause button sa footer.
+// Ito yung nagpapagana sa play/pause button doon (hindi galing sa mga
+// card, kundi yung nasa footer player mismo).
 if (playBtn) {
     playBtn.addEventListener("click", function() {
-        if (!audio.src) return; // wala pang na-load na song
+        if (!audio.src) return; // wala pang na-load na song, wala munang gagawin
 
         if (audio.paused) {
+            // kung naka-pause, i-resume/play — parehong kanta pa rin
+            // yung tumutugtog, itutuloy lang kung saan ito huminto
             audio.play();
             setPlayIcon(true);
         } else {
+            // kung tumutugtog, i-pause — mananatili yung current time
+            // (hindi mare-restart), kaya pwedeng i-resume ulit
             audio.pause();
             setPlayIcon(false);
         }
@@ -271,4 +307,99 @@ if (repeatBtn) {
         repeatBtn.classList.toggle("active");
         audio.loop = repeatBtn.classList.contains("active");
     });
+}
+
+// =====================================================================
+// ADDED BY KWATRO (bago): lahat ng code mula dito pababa ay bago —
+// walang natanggal o na-restructure sa mga existing code sa itaas nito.
+// Ito yung "Now Playing" centered view + lyrics display na hiwalay sa
+// footer player sa itaas (na hindi natin ginalaw).
+// =====================================================================
+
+// Mga reference sa bagong elements na dapat nasa index.php (sa loob ng
+// #nowPlayingSection): cover image, title, artist, lyrics box, at
+// "Back" button.
+const nowPlayingSection = document.getElementById("nowPlayingSection");
+const npCover = document.getElementById("npCover");
+const npTitle = document.getElementById("npTitle");
+const npArtist = document.getElementById("npArtist");
+const lyricsBox = document.getElementById("lyricsBox");
+const backBtn = document.getElementById("backBtn");
+
+// List ng mga existing sections (Trending, New Releases, Top Artists,
+// Albums) na itatago habang bukas yung Now Playing view.
+const sectionsToHide = [
+    document.getElementById("trendingSection"),
+    document.getElementById("newReleasesSection"),
+    document.getElementById("topArtistsSection"),
+    document.getElementById("albumsSection")
+];
+
+// Ipinapakita yung centered Now Playing panel: nilalagyan ng laman
+// (cover/title/artist) yung bagong elements, itinatago yung ibang
+// sections, tapos sini-scroll pataas para makita agad.
+function openNowPlaying(title, artist, cover) {
+    if (!nowPlayingSection) return;
+
+    if (npCover) npCover.src = cover;
+    if (npTitle) npTitle.textContent = title;
+    if (npArtist) npArtist.textContent = artist;
+
+    nowPlayingSection.style.display = "block";
+
+    sectionsToHide.forEach(sec => {
+        if (sec) sec.style.display = "none";
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Kabaligtaran ng openNowPlaying(): itinatago yung Now Playing panel at
+// ibinabalik yung normal na view — ito yung tinatawag pag pinindot yung
+// "Back" button. Hindi nito hinihinto yung audio, kasi tumutugtog pa rin
+// sa footer player.
+function closeNowPlaying() {
+    if (!nowPlayingSection) return;
+
+    nowPlayingSection.style.display = "none";
+
+    sectionsToHide.forEach(sec => {
+        if (sec) sec.style.display = "";
+    });
+}
+
+if (backBtn) {
+    backBtn.addEventListener("click", closeNowPlaying);
+}
+
+// Kumukuha ng lyrics gamit yung libreng lyrics.ovh API, base sa artist +
+// title ng kasalukuyang tumutugtog. Habang naglo-load, may spinner muna;
+// pag walang nahanap na lyrics o nag-error, may fallback message.
+async function fetchLyrics(title, artist) {
+    if (!lyricsBox) return;
+
+    lyricsBox.innerHTML = `
+        <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            Loading lyrics...
+        </div>
+    `;
+
+    try {
+        const response = await fetch(
+            `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
+        );
+        const data = await response.json();
+
+        if (!data.lyrics) {
+            lyricsBox.innerHTML = `<p style="opacity:.6;">Lyrics not found for this song.</p>`;
+            return;
+        }
+
+        lyricsBox.innerHTML = `<p style="white-space:pre-line;">${data.lyrics}</p>`;
+
+    } catch (error) {
+        console.log("Lyrics error:", error);
+        lyricsBox.innerHTML = `<p style="opacity:.6;">Failed to load lyrics.</p>`;
+    }
 }
