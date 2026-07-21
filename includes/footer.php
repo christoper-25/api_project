@@ -1,7 +1,23 @@
+<?php
+/* ============================================================
+   Edited by: Team Kwatro
+   File: footer.php
+
+   Mga binago:
+   - Tinanggal ang <?php if(isset($_SESSION['currentSong'])): ?>
+     na naka-wrap sa "player-left" (cover, title, artist,
+     favorite button) at "player-right" (volume slider).
+   - Dahilan: wala talagang code na nagse-set ng
+     $_SESSION['currentSong'] kahit saan sa project, kaya lagi
+     itong nagre-resolve sa "false" at hindi lumalabas ang mga
+     element na ito sa page. Kailangan muna nilang laging
+     lumabas para magamit ng script.js (playerCover, playerTitle,
+     playerArtist, volume).
+   ============================================================ */
+?>
 <footer class="music-player">
 
     <!-- Left: Current Song -->
-    <?php if(isset($_SESSION['currentSong'])): ?>
     <div class="player-left">
 
         <img
@@ -22,7 +38,6 @@
         </button>
 
     </div>
-    <?php endif; ?>
 
     <!-- Center: Playback Controls -->
     <div class="player-center">
@@ -70,7 +85,6 @@
     </div>
 
     <!-- Right: Volume -->
-    <?php if(isset($_SESSION['currentSong'])): ?>
     <div class="player-right">
 
         <i class="fas fa-volume-low"></i>
@@ -83,7 +97,6 @@
             value="100">
 
     </div>
-    <?php endif; ?>
 
     <!-- Audio Element -->
     <audio id="audioPlayer"></audio>
