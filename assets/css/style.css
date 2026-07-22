@@ -1100,3 +1100,89 @@ body{
     cursor:pointer;
 
 }
+
+/* ==========================
+   ADDED BY KWATRO
+   NOW PLAYING / SYNCED LYRICS
+========================== */
+
+/* Container ng buong Now Playing panel (cover, title, artist, lyrics) */
+.now-playing-content{
+    max-width:520px;
+    margin:0 auto;
+    text-align:center;
+}
+
+.now-playing-content #npCover{
+    width:260px;
+    height:260px;
+    object-fit:cover;
+    border-radius:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+
+.now-playing-content #npTitle{
+    margin-top:16px;
+    font-size:22px;
+    font-weight:700;
+}
+
+.now-playing-content #npArtist{
+    color:var(--text-light);
+    font-size:15px;
+}
+
+/* Back button - ginawang pareho ang look sa ibang buttons ng app (nav-btn style) */
+#backBtn{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:none;
+    border:none;
+    color:var(--text-light);
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    padding:10px 0 20px;
+    transition:var(--transition);
+}
+
+#backBtn:hover{
+    color:var(--white);
+}
+
+/* Lyrics box - dito lumalabas yung lyrics, naka-center at naka-scroll */
+.lyrics-box{
+    margin-top:24px;
+    max-height:360px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+    padding:30px 0;
+
+    /* pinapa-fade yung taas/baba ng lyrics box para hindi biglaan yung putol */
+    -webkit-mask-image:linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+    mask-image:linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+}
+
+/* Bawat linya ng lyrics - naka-center, hindi masyadong maliwanag habang hindi pa "current" */
+.lyric-line{
+    color:var(--text-light);
+    font-size:16px;
+    font-weight:500;
+    text-align:center;
+    line-height:1.5;
+    opacity:.5;
+    transition:color .25s ease, font-size .25s ease, opacity .25s ease, transform .25s ease;
+}
+
+/* Yung linyang kasabay ng oras ng kanta - highlighted, mas malaki, kulay green ng app */
+.lyric-line.active{
+    color:var(--green);
+    font-size:20px;
+    font-weight:700;
+    opacity:1;
+    transform:scale(1.03);
+}
